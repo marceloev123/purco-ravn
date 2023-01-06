@@ -33,7 +33,7 @@ export const ClaimsList: React.FC = () => {
       statusListQueryResult.data?.data.map(status => ({
         label: `${status.code} ( ${status.name})`,
         value: status.code,
-      })) ?? [],
+      })),
     [statusListQueryResult.data?.data]
   );
   const columns = useMemo<ColumnDef<IClaims>[]>(
@@ -52,7 +52,7 @@ export const ClaimsList: React.FC = () => {
             return (
               <Select
                 defaultValue="published"
-                data={statusOptions}
+                data={statusOptions ?? []}
                 {...props}
               />
             );
@@ -104,6 +104,7 @@ export const ClaimsList: React.FC = () => {
           "updated_at",
         ],
       },
+      initialFilter: [{ field: "status_code", value: "CD", operator: "eq" }],
     },
     columns,
   });

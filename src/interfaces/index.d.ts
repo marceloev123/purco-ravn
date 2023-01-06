@@ -13,3 +13,8 @@ export interface IStatus {
   name: string;
   group_name: string;
 }
+
+export interface IStatusGroup {
+  name: string;
+  description: string;
+}
