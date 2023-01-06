@@ -12,10 +12,17 @@ import {
   ErrorComponent,
 } from "@pankod/refine-mantine";
 
-import dataProvider, { GraphQLClient } from "@pankod/refine-strapi-graphql";
-import routerProvider from "@pankod/refine-react-router-v6";
+import dataProvider, { GraphQLClient } from "@pankod/refine-hasura";
 
-const client = new GraphQLClient(process.env.HASURA_API as string);
+import routerProvider from "@pankod/refine-react-router-v6";
+import { ClaimsList } from "pages/claims/list";
+
+const client = new GraphQLClient(process.env.REACT_APP_API_URL as string, {
+  headers: {
+    "x-hasura-admin-secret": process.env
+      .REACT_APP_HASURA_GRAPHQL_ADMIN_SECRET as string,
+  },
+});
 
 function App() {
   return (
@@ -29,6 +36,7 @@ function App() {
           ReadyPage={ReadyPage}
           catchAll={<ErrorComponent />}
           routerProvider={routerProvider}
+          resources={[{ name: "claims", list: ClaimsList }]}
         />
       </NotificationsProvider>
     </MantineProvider>
