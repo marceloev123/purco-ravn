@@ -10,15 +10,12 @@ import {
 import { IClaims } from "interfaces";
 import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
 import { useMemo } from "react";
+import { ColumnSorter } from "components/table/column-sorter";
+import { ColumnFilter } from "components/table/column-filter";
 
 export const ClaimsList: React.FC = () => {
   const columns = useMemo<ColumnDef<IClaims>[]>(
     () => [
-      {
-        id: "id",
-        header: "ID",
-        accessorKey: "id",
-      },
       {
         id: "claim_number",
         header: "Claim Number",
@@ -30,16 +27,24 @@ export const ClaimsList: React.FC = () => {
         accessorKey: "status_code",
       },
       {
-        id: "created_at",
-        header: "Created At",
-        accessorKey: "created_at",
+        id: "date_received",
+        header: "Received",
+        accessorKey: "date_received",
+        cell: function render({ getValue }) {
+          return <DateField value={getValue() as string} format="LLL" />;
+        },
+      },
+      {
+        id: "date_of_loss",
+        header: "Date of Loss",
+        accessorKey: "date_of_loss",
         cell: function render({ getValue }) {
           return <DateField value={getValue() as string} format="LLL" />;
         },
       },
       {
         id: "updated_at",
-        header: "Updated At",
+        header: "Last worked",
         accessorKey: "updated_at",
         cell: function render({ getValue }) {
           return <DateField value={getValue() as string} format="LLL" />;
@@ -57,7 +62,13 @@ export const ClaimsList: React.FC = () => {
     refineCoreProps: {
       resource: "claim",
       metaData: {
-        fields: ["id", "claim_number"],
+        fields: [
+          "claim_number",
+          "status_code",
+          "date_received",
+          "date_of_loss",
+          "updated_at",
+        ],
       },
     },
     columns,
@@ -81,6 +92,10 @@ export const ClaimsList: React.FC = () => {
                               header.getContext()
                             )}
                           </Box>
+                          <Group spacing="xs" noWrap>
+                            <ColumnSorter column={header.column} />
+                            <ColumnFilter column={header.column} />
+                          </Group>
                         </Group>
                       )}
                     </th>
