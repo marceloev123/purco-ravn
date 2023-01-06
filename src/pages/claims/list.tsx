@@ -7,10 +7,11 @@ import {
   DateField,
   Pagination,
   Select,
+  MultiSelect,
 } from "@pankod/refine-mantine";
-import { IClaims, IStatus } from "interfaces";
+import { IClaims, IStatus, IStatusGroup } from "interfaces";
 import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ColumnSorter } from "components/table/column-sorter";
 import { ColumnFilter } from "components/table/column-filter";
 import { useList } from "@pankod/refine-core";
@@ -21,10 +22,22 @@ export interface FilterElementProps {
 }
 
 export const ClaimsList: React.FC = () => {
+  const [selectedStatusGroup, setSelectedStatusGroup] = useState<string[]>([
+    "Closed",
+    "Open",
+  ]);
+
   const statusListQueryResult = useList<IStatus>({
     resource: "claim_status",
     metaData: {
       fields: ["code", "name", "group_name"],
+    },
+  });
+
+  const statusGroupListQueryResult = useList<IStatusGroup>({
+    resource: "claim_status_group",
+    metaData: {
+      fields: ["name", "description"],
     },
   });
 
@@ -36,6 +49,16 @@ export const ClaimsList: React.FC = () => {
       })),
     [statusListQueryResult.data?.data]
   );
+
+  const statusGroupOptions = useMemo(
+    () =>
+      statusGroupListQueryResult.data?.data.map(statusGroup => ({
+        label: statusGroup.description,
+        value: statusGroup.name,
+      })),
+    [statusGroupListQueryResult.data?.data]
+  );
+
   const columns = useMemo<ColumnDef<IClaims>[]>(
     () => [
       {
@@ -57,7 +80,6 @@ export const ClaimsList: React.FC = () => {
               />
             );
           },
-          filterOperator: "eq",
         },
       },
       {
@@ -91,6 +113,7 @@ export const ClaimsList: React.FC = () => {
   const {
     getHeaderGroups,
     getRowModel,
+
     refineCore: { setCurrent, pageCount, current },
   } = useTable({
     refineCoreProps: {
@@ -102,15 +125,40 @@ export const ClaimsList: React.FC = () => {
           "date_received",
           "date_of_loss",
           "updated_at",
+          {
+            claim_status: ["group_name"],
+          },
         ],
       },
-      initialFilter: [{ field: "status_code", value: "CD", operator: "eq" }],
+      initialFilter: [
+        {
+          field: "claim_status.group_name",
+          value: selectedStatusGroup,
+          operator: "in",
+        },
+      ],
     },
     columns,
   });
 
+  // const { selectProps: filterSelectProps } = useSelect<IStatusGroup>({
+  //   resource: "claim_status_group",
+  // });
+
   return (
     <ScrollArea>
+      {statusGroupListQueryResult.isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <MultiSelect
+          data={statusGroupOptions ?? []}
+          label="Filter by Status Group"
+          value={selectedStatusGroup}
+          onChange={value => {
+            setSelectedStatusGroup(value);
+          }}
+        />
+      )}
       <List>
         <Table highlightOnHover>
           <thead>
