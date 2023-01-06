@@ -7,3 +7,9 @@ export interface IClaims {
   created_at: string;
   updated_at: string;
 }
+
+export interface IStatus {
+  code: string;
+  name: string;
+  group_name: string;
+}

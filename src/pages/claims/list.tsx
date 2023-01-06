@@ -6,14 +6,36 @@ import {
   Table,
   DateField,
   Pagination,
+  Select,
 } from "@pankod/refine-mantine";
-import { IClaims } from "interfaces";
+import { IClaims, IStatus } from "interfaces";
 import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
 import { useMemo } from "react";
 import { ColumnSorter } from "components/table/column-sorter";
 import { ColumnFilter } from "components/table/column-filter";
+import { useList } from "@pankod/refine-core";
+
+export interface FilterElementProps {
+  value: any;
+  onChange: (value: any) => void;
+}
 
 export const ClaimsList: React.FC = () => {
+  const statusListQueryResult = useList<IStatus>({
+    resource: "claim_status",
+    metaData: {
+      fields: ["code", "name", "group_name"],
+    },
+  });
+
+  const statusOptions = useMemo(
+    () =>
+      statusListQueryResult.data?.data.map(status => ({
+        label: `${status.code} ( ${status.name})`,
+        value: status.code,
+      })) ?? [],
+    [statusListQueryResult.data?.data]
+  );
   const columns = useMemo<ColumnDef<IClaims>[]>(
     () => [
       {
@@ -25,6 +47,18 @@ export const ClaimsList: React.FC = () => {
         id: "status_code",
         header: "Status",
         accessorKey: "status_code",
+        meta: {
+          filterElement: function render(props: FilterElementProps) {
+            return (
+              <Select
+                defaultValue="published"
+                data={statusOptions}
+                {...props}
+              />
+            );
+          },
+          filterOperator: "eq",
+        },
       },
       {
         id: "date_received",
@@ -51,7 +85,7 @@ export const ClaimsList: React.FC = () => {
         },
       },
     ],
-    []
+    [statusOptions]
   );
 
   const {
