@@ -14,7 +14,7 @@ import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
 import { useMemo, useState } from "react";
 import { ColumnSorter } from "components/table/column-sorter";
 import { ColumnFilter } from "components/table/column-filter";
-import { useList } from "@pankod/refine-core";
+import { useSelect } from "@pankod/refine-core";
 
 export interface FilterElementProps {
   value: any;
@@ -27,37 +27,23 @@ export const ClaimsList: React.FC = () => {
     "Open",
   ]);
 
-  const statusListQueryResult = useList<IStatus>({
+  const { options: statusOptions } = useSelect<IStatus>({
     resource: "claim_status",
     metaData: {
       fields: ["code", "name", "group_name"],
     },
+    optionLabel: "name",
+    optionValue: "code",
   });
 
-  const statusGroupListQueryResult = useList<IStatusGroup>({
+  const { options: statusGroupOptions } = useSelect<IStatusGroup>({
     resource: "claim_status_group",
     metaData: {
       fields: ["name", "description"],
     },
+    optionLabel: "description",
+    optionValue: "name",
   });
-
-  const statusOptions = useMemo(
-    () =>
-      statusListQueryResult.data?.data.map(status => ({
-        label: `${status.code} ( ${status.name})`,
-        value: status.code,
-      })),
-    [statusListQueryResult.data?.data]
-  );
-
-  const statusGroupOptions = useMemo(
-    () =>
-      statusGroupListQueryResult.data?.data.map(statusGroup => ({
-        label: statusGroup.description,
-        value: statusGroup.name,
-      })),
-    [statusGroupListQueryResult.data?.data]
-  );
 
   const columns = useMemo<ColumnDef<IClaims>[]>(
     () => [
@@ -147,18 +133,15 @@ export const ClaimsList: React.FC = () => {
 
   return (
     <ScrollArea>
-      {statusGroupListQueryResult.isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <MultiSelect
-          data={statusGroupOptions ?? []}
-          label="Filter by Status Group"
-          value={selectedStatusGroup}
-          onChange={value => {
-            setSelectedStatusGroup(value);
-          }}
-        />
-      )}
+      <MultiSelect
+        data={statusGroupOptions ?? []}
+        label="Filter by Status Group"
+        value={selectedStatusGroup}
+        onChange={value => {
+          setSelectedStatusGroup(value);
+        }}
+      />
+
       <List>
         <Table highlightOnHover>
           <thead>

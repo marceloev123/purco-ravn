@@ -24,8 +24,6 @@ const client = new GraphQLClient(process.env.REACT_APP_API_URL as string, {
   },
 });
 
-console.log({ client });
-
 function App() {
   return (
     <MantineProvider theme={LightTheme} withNormalizeCSS withGlobalStyles>
