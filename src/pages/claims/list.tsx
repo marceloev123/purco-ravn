@@ -99,7 +99,6 @@ export const ClaimsList: React.FC = () => {
   const {
     getHeaderGroups,
     getRowModel,
-
     refineCore: { setCurrent, pageCount, current },
   } = useTable({
     refineCoreProps: {
@@ -146,20 +145,18 @@ export const ClaimsList: React.FC = () => {
                 {headerGroup.headers.map(header => {
                   return (
                     <th key={header.id}>
-                      {!header.isPlaceholder && (
+                      <Group spacing="xs" noWrap>
+                        <Box>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </Box>
                         <Group spacing="xs" noWrap>
-                          <Box>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                          </Box>
-                          <Group spacing="xs" noWrap>
-                            <ColumnSorter column={header.column} />
-                            <ColumnFilter column={header.column} />
-                          </Group>
+                          <ColumnSorter column={header.column} />
+                          <ColumnFilter column={header.column} />
                         </Group>
-                      )}
+                      </Group>
                     </th>
                   );
                 })}
