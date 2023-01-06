@@ -116,7 +116,7 @@ export const ClaimsList: React.FC = () => {
           },
         ],
       },
-      initialFilter: [
+      permanentFilter: [
         {
           field: "claim_status.group_name",
           value: selectedStatusGroup,
@@ -126,10 +126,6 @@ export const ClaimsList: React.FC = () => {
     },
     columns,
   });
-
-  // const { selectProps: filterSelectProps } = useSelect<IStatusGroup>({
-  //   resource: "claim_status_group",
-  // });
 
   return (
     <ScrollArea>
