@@ -111,13 +111,13 @@ export const ClaimsList: React.FC = () => {
           "date_of_loss",
           "updated_at",
           {
-            claim_status: ["group_name"],
+            status: ["group_name"],
           },
         ],
       },
       permanentFilter: [
         {
-          field: "claim_status.group_name",
+          field: "status.group_name",
           value: selectedStatusGroup,
           operator: "in",
         },

@@ -17,5 +17,5 @@ export interface IClaims {
   date_of_loss: string;
   created_at: string;
   updated_at: string;
-  claim_status: IStatus;
+  status: IStatus;
 }
