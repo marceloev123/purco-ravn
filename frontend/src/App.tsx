@@ -3,6 +3,7 @@ import "./App.css";
 import SuperTokens, {
   SuperTokensWrapper,
   getSuperTokensRoutesForReactRouterDom,
+  getRoutingComponent,
 } from "supertokens-auth-react";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { Routes, BrowserRouter as Router, Route } from "react-router-dom";
@@ -20,53 +21,37 @@ import {
   ErrorComponent,
 } from "@pankod/refine-mantine";
 
-import dataProvider, { GraphQLClient } from "@pankod/refine-strapi-graphql";
+import dataProvider, { GraphQLClient } from "@pankod/refine-hasura";
 import routerProvider from "@pankod/refine-react-router-v6";
 import LogoutButton from "LogoutButton";
+import { ClaimsList } from "pages/claims/list";
 
 const client = new GraphQLClient(process.env.HASURA_API as string);
 
 SuperTokens.init(SuperTokensConfig);
 
+console.log(getSuperTokensRoutesForReactRouterDom(require("react-router-dom")));
 function App() {
   return (
     <MantineProvider theme={LightTheme} withNormalizeCSS withGlobalStyles>
       <Global styles={{ body: { WebkitFontSmoothing: "auto" } }} />
       <NotificationsProvider position="top-right">
         <SuperTokensWrapper>
-          <div className="App">
-            <Router>
-              <div className="fill">
-                <Routes>
-                  {/* This shows the login UI on "/auth" route */}
-                  {getSuperTokensRoutesForReactRouterDom(
-                    require("react-router-dom")
-                  )}
-
-                  <Route
-                    path="/"
-                    element={
-                      /* This protects the "/" route so that it shows
-                                  <Home /> only if the user is logged in.
-                                  Else it redirects the user to "/auth" */
-                      <SessionAuth>
-                        <div>
-                          <LogoutButton />
-                          <Refine
-                            dataProvider={dataProvider(client)}
-                            notificationProvider={notificationProvider}
-                            Layout={Layout}
-                            ReadyPage={ReadyPage}
-                            catchAll={<ErrorComponent />}
-                            routerProvider={routerProvider}
-                          />
-                        </div>
-                      </SessionAuth>
-                    }
-                  />
-                </Routes>
-              </div>
-            </Router>
+          <div>
+            <Refine
+              dataProvider={dataProvider(client)}
+              notificationProvider={notificationProvider}
+              Layout={Layout}
+              ReadyPage={ReadyPage}
+              catchAll={<ErrorComponent />}
+              routerProvider={{
+                ...routerProvider,
+                routes: getSuperTokensRoutesForReactRouterDom(
+                  require("react-router-dom")
+                ).map((route) => route.props),
+              }}
+              resources={[{ name: "claims", list: ClaimsList }]}
+            />
           </div>
         </SuperTokensWrapper>
       </NotificationsProvider>
