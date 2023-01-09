@@ -15,8 +15,6 @@ import { useMemo, useState } from "react";
 import { ColumnSorter } from "components/table/column-sorter";
 import { ColumnFilter } from "components/table/column-filter";
 import { useSelect } from "@pankod/refine-core";
-import LogoutButton from "LogoutButton";
-import { SessionAuth } from "supertokens-auth-react/recipe/session";
 
 export interface FilterElementProps {
   value: any;
@@ -101,7 +99,6 @@ export const ClaimsList: React.FC = () => {
   const {
     getHeaderGroups,
     getRowModel,
-
     refineCore: { setCurrent, pageCount, current },
   } = useTable({
     refineCoreProps: {
@@ -114,13 +111,13 @@ export const ClaimsList: React.FC = () => {
           "date_of_loss",
           "updated_at",
           {
-            claim_status: ["group_name"],
+            status: ["group_name"],
           },
         ],
       },
-      initialFilter: [
+      permanentFilter: [
         {
-          field: "claim_status.group_name",
+          field: "status.group_name",
           value: selectedStatusGroup,
           operator: "in",
         },
@@ -129,79 +126,70 @@ export const ClaimsList: React.FC = () => {
     columns,
   });
 
-  // const { selectProps: filterSelectProps } = useSelect<IStatusGroup>({
-  //   resource: "claim_status_group",
-  // });
-
   return (
-    <SessionAuth>
-      <ScrollArea>
-        <LogoutButton />
-        <MultiSelect
-          data={statusGroupOptions ?? []}
-          label="Filter by Status Group"
-          value={selectedStatusGroup}
-          onChange={(value) => {
-            setSelectedStatusGroup(value);
-          }}
-        />
+    <ScrollArea>
+      <MultiSelect
+        data={statusGroupOptions ?? []}
+        label="Filter by Status Group"
+        value={selectedStatusGroup}
+        onChange={value => {
+          setSelectedStatusGroup(value);
+        }}
+      />
 
-        <List>
-          <Table highlightOnHover>
-            <thead>
-              {getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
+      <List>
+        <Table highlightOnHover>
+          <thead>
+            {getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => {
+                  return (
+                    <th key={header.id}>
+                      <Group spacing="xs" noWrap>
+                        <Box>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </Box>
+                        <Group spacing="xs" noWrap>
+                          <ColumnSorter column={header.column} />
+                          <ColumnFilter column={header.column} />
+                        </Group>
+                      </Group>
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {getRowModel().rows.map(row => {
+              return (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map(cell => {
                     return (
-                      <th key={header.id}>
-                        {!header.isPlaceholder && (
-                          <Group spacing="xs" noWrap>
-                            <Box>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                            </Box>
-                            <Group spacing="xs" noWrap>
-                              <ColumnSorter column={header.column} />
-                              <ColumnFilter column={header.column} />
-                            </Group>
-                          </Group>
+                      <td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
                         )}
-                      </th>
+                      </td>
                     );
                   })}
                 </tr>
-              ))}
-            </thead>
-            <tbody>
-              {getRowModel().rows.map((row) => {
-                return (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-          <br />
-          <Pagination
-            position="right"
-            total={pageCount}
-            page={current}
-            onChange={setCurrent}
-          />{" "}
-        </List>
-      </ScrollArea>
-    </SessionAuth>
+              );
+            })}
+          </tbody>
+        </Table>
+        <br />
+        <Pagination
+          position="right"
+          total={pageCount}
+          page={current}
+          onChange={setCurrent}
+        />{" "}
+      </List>
+    </ScrollArea>
   );
 };

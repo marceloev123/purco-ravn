@@ -1,13 +1,10 @@
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "supertokens-auth-react/recipe/session";
-import { getJWT } from "getJWT";
 
 export default function LogoutButton() {
   const sessionContext = useSessionContext();
   const navigate = useNavigate();
-
-  getJWT();
 
   async function logoutClicked() {
     await signOut();
