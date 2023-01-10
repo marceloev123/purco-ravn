@@ -4,17 +4,18 @@ import { TypeInput } from "supertokens-node/types";
 import Dashboard from "supertokens-node/recipe/dashboard";
 import EmailVerification from "supertokens-node/recipe/emailverification";
 
+require("dotenv").config();
+
 export const SuperTokensConfig: TypeInput = {
   supertokens: {
     // this is the location of the SuperTokens core.
-    connectionURI:
-      "https://dev-fb374cd18df611edbe491f2084ae5133-us-east-1.aws.supertokens.io:3569",
-    apiKey: "q2qPdvEA=rAmjMYc1o3bFN6nl-y79C",
+    connectionURI: process.env.SUPERTOKENS_CONNECTION_URI as string,
+    apiKey: process.env.SUPERTOKENS_API_KEY as string,
   },
   appInfo: {
     appName: "SuperTokens Demo App",
-    apiDomain: "http://localhost:3001",
-    websiteDomain: "http://localhost:3000",
+    apiDomain: process.env.API_DOMAIN as string,
+    websiteDomain: process.env.WEBSITE_DOMAIN as string,
   },
   // recipeList contains all the modules that you want to
   // use from SuperTokens. See the full list here: https://supertokens.com/docs/guides
